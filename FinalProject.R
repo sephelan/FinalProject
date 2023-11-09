@@ -5,6 +5,7 @@ stream = read.csv('streamflow.csv')
 stream$STAID <- NULL
 
 library(car)
+library(lme4)
 
 ######## exploratory data analysis #######
 summary(stream)
