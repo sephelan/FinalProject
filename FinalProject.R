@@ -36,5 +36,46 @@ cor_stream = cor(stream)
 cor_stream
 #write.csv(cor_stream,"ProbMatrix.csv")
 
-addVarPlotModel <- lm(data=stream,max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_BASIN+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
+streamFirstModel <- lm(data=stream,max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_BASIN+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
 avPlots(addVarPlotModel)
+
+###### all predictor linear model analysis
+
+n=length(stream$max90)
+p=8
+alpha = .05
+
+Y <- matrix(data=stream$max90,nrow = n,ncol = 1)
+X <- as.matrix(stream[2:8])
+X <- cbind(rep.int(1,n),X)
+colnames(X)[1]<-"Intercept"
+
+inv.XX <- solve(t(X)%*%X)
+b <- inv.XX%*%t(X)%*%Y
+
+I <- diag(1,n,n)
+H <- X%*%inv.XX%*%t(X)
+Yhat <- H%*%Y
+e <- Y - Yhat
+
+J <- matrix(rep.int(1,n*n),ncol=n,nrow = n)
+SSE <- t(Y)%*%(I-H)%*%Y
+MSE <- SSE/(n-p)
+
+SST <- t(Y)%*%(I-(1/n)*J)%*%Y
+SSR <- t(Y)%*%(H-(1/n)*J)%*%Y
+
+Rsquared <- 1-(SSE/SST)
+RsqAdj <- 1-((n-1)/(n-p))*(SSE/SST)
+
+MSR <- SSR/(p-1)
+Fstat <- MSR/MSE
+CritF <- qf(.95,p-1,n-p)
+pval <- 1-pf(Fstat,p-1,n-p)
+
+cov.b <- inv.XX*c(MSE)
+s.bhats <- sqrt(diag(cov.b))
+
+t.values <- b/s.bhats
+p.values <- 2*(1-pt(abs(t.values),n-p))
+p.values
