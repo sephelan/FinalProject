@@ -68,5 +68,18 @@ plot(res_stream~fittedvalues_stream, xlab="fitted values", ylab="residual",
      main="Plot of residuals against fitted values")
 
 #  residual plots against predictor values: 
+par(mfrow=c(2,4))
 plot(res_stream~stream$DRAIN_SQKM, xlab="Violent predictor", ylab="residual", 
+     main="Plot of residuals against Violent predictor")
+plot(res_stream~stream$PPTAVG_BASIN, xlab="Violent predictor", ylab="residual", 
+     main="Plot of residuals against Violent predictor")
+plot(res_stream~stream$T_AVG_BASIN, xlab="Violent predictor", ylab="residual", 
+     main="Plot of residuals against Violent predictor")
+plot(res_stream~stream$T_AVG_SITE, xlab="Violent predictor", ylab="residual", 
+     main="Plot of residuals against Violent predictor")
+plot(res_stream~stream$RH_BASIN, xlab="Violent predictor", ylab="residual", 
+     main="Plot of residuals against Violent predictor")
+plot(res_stream~stream$MAR_PPT7100_CM, xlab="Violent predictor", ylab="residual", 
+     main="Plot of residuals against Violent predictor")
+plot(res_stream~stream$RRMEDIAN, xlab="Violent predictor", ylab="residual", 
      main="Plot of residuals against Violent predictor")
