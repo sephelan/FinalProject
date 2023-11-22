@@ -69,20 +69,20 @@ plot(res_stream~fittedvalues_stream, xlab="fitted values", ylab="residual",
 
 #  residual plots against predictor values: 
 par(mfrow=c(2,4))
-plot(res_stream~stream$DRAIN_SQKM, xlab="Violent predictor", ylab="residual", 
-     main="Plot of residuals against Violent predictor")
-plot(res_stream~stream$PPTAVG_BASIN, xlab="Violent predictor", ylab="residual", 
-     main="Plot of residuals against Violent predictor")
-plot(res_stream~stream$T_AVG_BASIN, xlab="Violent predictor", ylab="residual", 
-     main="Plot of residuals against Violent predictor")
-plot(res_stream~stream$T_AVG_SITE, xlab="Violent predictor", ylab="residual", 
-     main="Plot of residuals against Violent predictor")
-plot(res_stream~stream$RH_BASIN, xlab="Violent predictor", ylab="residual", 
-     main="Plot of residuals against Violent predictor")
-plot(res_stream~stream$MAR_PPT7100_CM, xlab="Violent predictor", ylab="residual", 
-     main="Plot of residuals against Violent predictor")
-plot(res_stream~stream$RRMEDIAN, xlab="Violent predictor", ylab="residual", 
-     main="Plot of residuals against Violent predictor")
+plot(res_stream~stream$DRAIN_SQKM, xlab="Drain Area", ylab="residual", 
+     main="Plot of residuals against Drain Area")
+plot(res_stream~stream$PPTAVG_BASIN, xlab="Basin-Averaged Precipitation", ylab="residual", 
+     main="Plot of residuals against Basin-Averaged Precipitation")
+plot(res_stream~stream$T_AVG_BASIN, xlab="Basin-Averaged Temperature ", ylab="residual", 
+     main="Plot of residuals against Basin-Averaged Temperature ")
+plot(res_stream~stream$T_AVG_SITE, xlab="At-Site Temperature", ylab="residual", 
+     main="Plot of residuals against At-Site Temperature")
+plot(res_stream~stream$RH_BASIN, xlab="Basin-Averaged Relative Humidity", ylab="residual", 
+     main="Plot of residuals against Basin-Averaged Relative Humidity")
+plot(res_stream~stream$MAR_PPT7100_CM, xlab="Median Relief Ratio", ylab="residual", 
+     main="Plot of residuals against Median Relief Ratio")
+plot(res_stream~stream$RRMEDIAN, xlab="Average March Precipitatio", ylab="residual", 
+     main="Plot of residuals against Average March Precipitatio")
 
 ######## exploratory data analysis #######
 summary(stream)
@@ -157,3 +157,9 @@ t.values <- b/s.bhats
 p.values <- 2*(1-pt(abs(t.values),n-p))
 p.values
 
+# ###### adding in residual plots and all the df tests ###
+plot(res_stream~ stream$max90,xlab="Response Variable",ylab="Residual", 
+     main="Plot of residuals against Response Variable")
+ols_plot_dffits(regstream)
+ols_plot_cooksd_chart(regstream)
+ols_plot_dfbetas(regstream)
