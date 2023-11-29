@@ -8,6 +8,7 @@ library('car')
 library('pracma')
 library('moments')
 library('DescTools')
+library('olsrr')
 ######## exploratory data analysis #######
 summary(stream)
 
@@ -163,3 +164,6 @@ plot(res_stream~ stream$max90,xlab="Response Variable",ylab="Residual",
 ols_plot_dffits(regstream)
 ols_plot_cooksd_chart(regstream)
 ols_plot_dfbetas(regstream)
+summary(regstream)
+plot(regstream)
+table(stream$max90)
