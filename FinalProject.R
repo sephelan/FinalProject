@@ -164,11 +164,10 @@ plot(res_stream~ stream$max90,xlab="Response Variable",ylab="Residual",
 ols_plot_dffits(regstream)
 ols_plot_cooksd_chart(regstream)
 ols_plot_dfbetas(regstream)
-<<<<<<< HEAD
 summary(regstream)
 plot(regstream)
 table(stream$max90)
-=======
+
 
 
 
@@ -195,4 +194,3 @@ b.w<-inv.XWX%*%XWY
 #F
 b.sd = sqrt(diag(inv.XWX))
 #these std dev's are similar, but noticeably smaller.
->>>>>>> 4b9367c57c63381239e59793625bff072f100bab
