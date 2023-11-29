@@ -8,6 +8,7 @@ library('car')
 library('pracma')
 library('moments')
 library('DescTools')
+library('olsrr')
 ######## exploratory data analysis #######
 summary(stream)
 
@@ -163,3 +164,29 @@ plot(res_stream~ stream$max90,xlab="Response Variable",ylab="Residual",
 ols_plot_dffits(regstream)
 ols_plot_cooksd_chart(regstream)
 ols_plot_dfbetas(regstream)
+
+
+
+
+######### Model Fitting ########
+summary(streamFirstModel)
+plot(streamFirstModel)
+streamReducedModel = lm(stream$max90~stream$DRAIN_SQKM)
+summary(streamReducedModel)
+
+
+
+
+##########multicolinearity#################
+weights = 1/streamFirstModel$fitted.values
+
+#e
+W <- diag(weights)
+inv.XWX <- solve(t(X)%*%W%*%X)
+XWY <- t(X)%*%W%*%Y
+b.w<-inv.XWX%*%XWY
+#Yes, the weighted estimates are almost identical.
+
+#F
+b.sd = sqrt(diag(inv.XWX))
+#these std dev's are similar, but noticeably smaller.
