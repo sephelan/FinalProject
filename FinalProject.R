@@ -177,7 +177,7 @@ summary(streamFirstModel)
 plot(streamFirstModel)
 streamReducedModel = lm(stream$max90~stream$DRAIN_SQKM)
 summary(streamReducedModel)
-
+res_reducedmodel <- residuals()
 
 
 
@@ -194,3 +194,32 @@ b.w<-inv.XWX%*%XWY
 #F
 b.sd = sqrt(diag(inv.XWX))
 #these std dev's are similar, but noticeably smaller.
+
+ # normality test for full # 
+qqnorm(res_stream)
+qqline(res_stream)
+shapiro.test(res_stream)
+
+#  constant variances test for full #
+################## Lack of fit test template and example for just x90 #####
+# Lack of fit test aims to see if our fitted model is a more optimal model compared to the full model
+# Needs assumptions of independence, constant variance, and normality with respect to the error terms.
+#  also needs repeated observations, which we know we have. 
+#  we know that 
+# ? do we need to check assumptions for both reduced and full? 
+# anova(reduced.lmfit,full.lmfit) lack of fit test
+# h0: the full model is a better fit. ha: the reduced model is a better fit.
+anova(streamReducedModel,streamFirstModel)
+#  pvalue = 2.598e-08 so we have evidence to say the reduced model is a better fit. 
+
+############ BP test #############
+# Assumptions needed: Independence and normality with respect to error terms. 
+# it also assumed variances of error terms are related ,??? how to test
+# H0: y1 = 0 or the variances are constant. Ha: y1=/=0, the the assumption of constant variances is violated. 
+# we know the normality assumption good, 
+bptest(streamFirstModel)
+# p-value = 1.505e-08, so we have enough evidence to reject ho, non constant variances. 
+bptest(streamReducedModel)
+# p-value = 0.00317 also no constant variances. 
+
+######## Box COX Transformations  ##########
