@@ -9,6 +9,17 @@ library('pracma')
 library('moments')
 library('DescTools')
 library('olsrr')
+library("caret")
+library("HH")
+library("leaps")
+library("StepReg")
+library('lmtest')
+library('EnvStats')
+library('lawstat')
+library('corrplot')
+library('tidyverse')
+library('e1071')
+install.packages('e1071')
 ######## exploratory data analysis #######
 summary(stream)
 
@@ -223,3 +234,14 @@ bptest(streamReducedModel)
 # p-value = 0.00317 also no constant variances. 
 
 ######## Box COX Transformations  ##########
+#  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
+logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+res_logmodel <- residuals(logmodel)
+fit_log <- fitted.values(logmodel)
+plot(res_logmodel~fit_log)
+qqnorm(res_logmodel)
+qqline(res_logmodel)
+shapiro.test(res_logmodel)
+boxcox.summary <- boxcox(streamReducedModel,optimize = TRUE)
+boxcox.summary$lambda
+summary(regstream)
