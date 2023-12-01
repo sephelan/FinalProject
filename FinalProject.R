@@ -241,9 +241,14 @@ summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BAS
 summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN))
 streamFinalModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN)
 
+boxcox.summary <- boxcox(streamFinalModel,optimize = TRUE)
+boxcox.summary$lambda
 
-
-
+transfinalmodel <- lm(sqrt(stream$max90)~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN)
+res_tran <- residuals((transfinalmodel))
+qqnorm(res_tran)
+qqline(res_tran)
+shapiro.test(res_tran)
 #  pvalue = 2.598e-08 so we have evidence to say the reduced model is a better fit. 
 
 ############ BP test #############
