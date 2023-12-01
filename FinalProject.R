@@ -243,7 +243,7 @@ streamFinalModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stre
 
 
 
-
+ 
 #  pvalue = 2.598e-08 so we have evidence to say the reduced model is a better fit. 
 
 ############ BP test #############
