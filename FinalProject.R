@@ -242,19 +242,17 @@ summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BAS
 streamFinalModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN)
 
 boxcox.summary <- boxcox(streamFinalModel,optimize = TRUE)
-boxcox.summary$lambda
+lambda <- boxcox.summary$lambda
 
-<<<<<<< HEAD
 transfinalmodel <- lm((stream$max90)^lambda ~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN)
-res_tran <- rstudent((transfinalmodel))
+res_tran <- transfinalmodel$residuals
+jacknifes.trans <- rstudent((transfinalmodel))
 summary(transfinalmodel)
 qqnorm(res_tran)
 qqline(res_tran)
-ks.test(res_tran, 'pnorm', 0 ,1)
-=======
+ks.test(jacknifes.trans, 'pnorm', 0 ,1)
 
  
->>>>>>> 5adda88ad0a4e3f5414c74ca8ab48f34be21fb46
 #  pvalue = 2.598e-08 so we have evidence to say the reduced model is a better fit. 
 
 ############ BP test #############
@@ -276,11 +274,10 @@ plot(res_logmodel~fit_log)
 qqnorm(res_logmodel)
 qqline(res_logmodel)
 shapiro.test(res_logmodel)
-boxcox.summary <- boxcox(streamReducedModel,optimize = TRUE)
- lambda <- boxcox.summary$lambda
 summary(regstream)
  b <- ols_step_all_possible(regstream)
 plot(b) 
 lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-summary(lambdamodel)
+summary(transfinalmodel)
+vif(lambdamodel)
 
