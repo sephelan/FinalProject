@@ -19,7 +19,6 @@ library('lawstat')
 library('corrplot')
 library('tidyverse')
 library('e1071')
-install.packages('e1071')
 ######## exploratory data analysis #######
 summary(stream)
 streamFirstModel <- lm(data=stream,max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_BASIN+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
@@ -280,7 +279,8 @@ boxcox.summary <- boxcox(streamReducedModel,optimize = TRUE)
  lambda <- boxcox.summary$lambda
 summary(regstream)
  b <- ols_step_all_possible(regstream)
-plot(b) 
+ c <- ols_step_all_possible(streamCorFixModel)
+plot(c) 
 lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 summary(lambdamodel)
 
