@@ -233,12 +233,6 @@ ks.test(jacknifes,'pnorm',0,1)
 # ? do we need to check assumptions for both reduced and full? 
 # anova(reduced.lmfit,full.lmfit) lack of fit test
 # h0: the full model is a better fit. ha: the reduced model is a better fit.
-anova(streamReducedModel,streamCorFixModel)
-summary(streamReducedModel)
-summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM))
-summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN))
-summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN))
-streamFinalModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN)
 
 boxcox.summary <- boxcox(streamFinalModel,optimize = TRUE)
 lambda <- boxcox.summary$lambda
@@ -280,4 +274,32 @@ plot(c)
 lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 summary(transfinalmodel)
 vif(lambdamodel)
+
+testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)
+
+
+summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN))
+summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM+stream$PPTAVG_BASIN*stream$DRAIN_SQKM))
+
+summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM))
+interactionModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+(stream$MAR_PPT7100_CM*stream$DRAIN_SQKM))
+boxcox.interact <- boxcox(interactionModel,optimize=TRUE)
+AIC(interactionModel)
+BIC(interactionModel)
+summary(lm(stream$max90^boxcox.interact$lambda~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+(stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)))        
+AIC(streamFinalModel)
+ols_mallows_cp(interactionModel,streamCorFixModel)
+ols_mallows_cp(streamFinalModel,streamCorFixModel)
+
+d <- ols_step_all_possible(testingModel)
+plot(d)
+summary(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+
+
+finalModel<- lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
+
+boxcox.interact <- boxcox(finalModel,optimize=TRUE)
+summary(lm(stream$max90^boxcox.interact$lambda ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$RRMEDIAN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+
+
 
