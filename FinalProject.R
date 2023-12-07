@@ -301,5 +301,17 @@ finalModel<- lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_
 boxcox.interact <- boxcox(finalModel,optimize=TRUE)
 summary(lm(stream$max90^boxcox.interact$lambda ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$RRMEDIAN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
 
-
-
+####### stepwise code: forward selection#####
+summary(testingModel)
+lm_base<- lm(stream$max90 ~ stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
+summary(lm_base)
+lm_add1<- lm(stream$max90 ~ stream$DRAIN_SQKM + stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
+summary(lm_add1)
+lm_add2 <- lm(stream$max90 ~ stream$T_AVG_BASIN + stream$DRAIN_SQKM  +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
+summary(lm_add2)
+lm_add3 <- lm(stream$max90 ~  stream$RH_BASIN + stream$T_AVG_BASIN + stream$DRAIN_SQKM  +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
+summary(lm_add3)
+lm_add3
+########## plots for model fitting#######
+t <- ols_step_all_possible(testingModel)
+plot(t)
