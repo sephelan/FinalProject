@@ -277,7 +277,6 @@ bptest(streamCorFixModel)
 
 ######## Box COX Transformations  ##########
 #  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
-<<<<<<< HEAD
 #logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 #res_logmodel <- residuals(logmodel)
 #fit_log <- fitted.values(logmodel)
@@ -292,7 +291,6 @@ bptest(streamCorFixModel)
 #lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 #summary(transfinalmodel)
 #vif(lambdamodel)
-||||||| 7c19fe0
 logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 res_logmodel <- residuals(logmodel)
 fit_log <- fitted.values(logmodel)
@@ -309,7 +307,6 @@ summary(transfinalmodel)
 vif(lambdamodel)
 
 testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)
-=======
 logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 res_logmodel <- residuals(logmodel)
 fit_log <- fitted.values(logmodel)
@@ -326,7 +323,6 @@ summary(transfinalmodel)
 vif(lambdamodel)
 
 testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM:stream$DRAIN_SQKM)
->>>>>>> 8a3e15ffe334670d6427315667f44719d1ad367b
 
 
 AIC(streamInterAddModel)
