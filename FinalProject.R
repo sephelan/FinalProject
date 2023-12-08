@@ -190,31 +190,48 @@ streamReducedModel <- lm(stream$max90~stream$DRAIN_SQKM)
 summary(streamReducedModel)
 res_reducedmodel <- residuals(streamReducedModel)
 
-
-
 ##########multicolinearity#################
 vif(streamFirstModel)
 #yes, mostly avg basin and avg site with less in ppt avg basin
 streamNOBasinModel <- lm(data = stream , max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
 streamNOSiteModel <- lm(data = stream , max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_BASIN+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
 streamNOavgbasinModel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_SITE+T_AVG_BASIN+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
+streamNOmarpptModel <- lm(data = stream , max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_SITE+T_AVG_BASIN+RH_BASIN+RRMEDIAN)
 vif(streamNOSiteModel)
 vif(streamNOBasinModel)
 vif(streamNOavgbasinModel)
-streamavgsiteModel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
-streamavgbasinodel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_BASIN+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
-streampptavgModel <- lm(data = stream , max90~DRAIN_SQKM+PPTAVG_BASIN+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
-streamavgbasinodel
-sum(1-1/vif(streamavgbasinodel))
-streamavgsiteModel
-sum(1-1/vif(streamavgsiteModel))
-vif(streampptavgModel)
+vif(streamNOmarpptModel)
+streamavgsiteMARModel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
+streamavgbasinMARodel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_BASIN+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
+streamavgsitePPTModel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+PPTAVG_BASIN+RRMEDIAN)
+streamavgbasinPPTodel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_BASIN+RH_BASIN+PPTAVG_BASIN+RRMEDIAN)
+vif(streamavgbasinMARodel)
+sum(vif(streamavgbasinMARodel))
+vif(streamavgsiteMARModel)
+sum(vif(streamavgsiteMARModel))
+vif(streamavgsitePPTModel)
+sum(vif(streamavgsitePPTModel))
+vif(streamavgbasinPPTodel)
+sum(vif(streamavgbasinPPTodel))
+
+streamCorFixModel <- lm(data = stream, max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
+summary(streamCorFixModel)
+summary(streamFirstModel)
 anova(streamCorFixModel,streamFirstModel)
 #now we have r2=.487 > r2=.465, meaning we will use our model streamavgbasinmodel
-streamCorFixModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN)
+streamInterAddModel <- lm(data = stream, max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN+DRAIN_SQKM:MAR_PPT7100_CM)
 
+
+anova(streamInterAddModel,streamCorFixModel)
 res_corfix <- streamCorFixModel$residuals
 jacknifes <- rstudent(streamCorFixModel)
+
+lmtest <- lm(data = stream, max90~(DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)^2)
+anova(lmtest)
+summary(lmtest)
+
+streamManyInteractModel <- lm(data = stream, max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN+DRAIN_SQKM:MAR_PPT7100_CM+T_AVG_SITE:RRMEDIAN+DRAIN_SQKM:T_AVG_SITE+DRAIN_SQKM:RRMEDIAN)
+summary(streamManyInteractModel)
 
 
  # normality test for full # 
@@ -234,16 +251,16 @@ ks.test(jacknifes,'pnorm',0,1)
 # anova(reduced.lmfit,full.lmfit) lack of fit test
 # h0: the full model is a better fit. ha: the reduced model is a better fit.
 
-boxcox.summary <- boxcox(streamFinalModel,optimize = TRUE)
-lambda <- boxcox.summary$lambda
+#boxcox.summary <- boxcox(streamCorFixModel,optimize = TRUE)
+#lambda <- boxcox.summary$lambda
 
-transfinalmodel <- lm((stream$max90)^lambda ~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN)
-res_tran <- transfinalmodel$residuals
-jacknifes.trans <- rstudent((transfinalmodel))
-summary(transfinalmodel)
-qqnorm(res_tran)
-qqline(res_tran)
-ks.test(jacknifes.trans, 'pnorm', 0 ,1)
+#transfinalmodel <- lm((stream$max90)^lambda ~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN)
+#res_tran <- transfinalmodel$residuals
+#jacknifes.trans <- rstudent((transfinalmodel))
+#summary(transfinalmodel)
+#qqnorm(res_tran)
+#qqline(res_tran)
+#ks.test(jacknifes.trans, 'pnorm', 0 ,1)
 
  
 #  pvalue = 2.598e-08 so we have evidence to say the reduced model is a better fit. 
@@ -255,51 +272,72 @@ ks.test(jacknifes.trans, 'pnorm', 0 ,1)
 # we know the normality assumption good, 
 bptest(streamFirstModel)
 # p-value = 1.505e-08, so we have enough evidence to reject ho, non constant variances. 
-bptest(streamReducedModel)
+bptest(streamCorFixModel)
 # p-value = 0.00317 also no constant variances. 
 
 ######## Box COX Transformations  ##########
 #  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
-logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-res_logmodel <- residuals(logmodel)
-fit_log <- fitted.values(logmodel)
-plot(res_logmodel~fit_log)
-qqnorm(res_logmodel)
-qqline(res_logmodel)
-shapiro.test(res_logmodel)
-summary(regstream)
- b <- ols_step_all_possible(regstream)
- c <- ols_step_all_possible(streamCorFixModel)
-plot(c) 
-lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-summary(transfinalmodel)
-vif(lambdamodel)
-
-testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)
+#logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+#res_logmodel <- residuals(logmodel)
+#fit_log <- fitted.values(logmodel)
+#plot(res_logmodel~fit_log)
+#qqnorm(res_logmodel)
+#qqline(res_logmodel)
+#shapiro.test(res_logmodel)
+#summary(regstream)
+# b <- ols_step_all_possible(regstream)
+# c <- ols_step_all_possible(streamCorFixModel)
+#plot(c) 
+#lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+#summary(transfinalmodel)
+#vif(lambdamodel)
 
 
-summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN))
-summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM+stream$PPTAVG_BASIN*stream$DRAIN_SQKM))
+AIC(streamInterAddModel)
+BIC(streamInterAddModel)
+#summary(lm(stream$max90^boxcox.interact$lambda~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+(stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)))        
+#AIC(streamFinalModel)
+ols_mallows_cp(streamInterAddModel,streamCorFixModel)
 
-summary(lm(stream$max90~stream$DRAIN_SQKM+stream$MAR_PPT7100_CM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM))
-interactionModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+(stream$MAR_PPT7100_CM*stream$DRAIN_SQKM))
-boxcox.interact <- boxcox(interactionModel,optimize=TRUE)
-AIC(interactionModel)
-BIC(interactionModel)
-summary(lm(stream$max90^boxcox.interact$lambda~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+(stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)))        
-AIC(streamFinalModel)
-ols_mallows_cp(interactionModel,streamCorFixModel)
-ols_mallows_cp(streamFinalModel,streamCorFixModel)
-
-d <- ols_step_all_possible(testingModel)
+d <- ols_step_all_possible(streamInterAddModel)
 plot(d)
 summary(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
 
+summary(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+AIC(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+BIC(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+
 
 finalModel<- lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
+AIC(finalModel)
+BIC(finalModel)
 
+e <- ols_step_all_possible(streamManyInteractModel)
+plot(e)
+
+models = e$predictors[c(130,256,382,466,502)]
+models
+model130 <- lm(data=stream, max90~RH_BASIN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE)
+model256 <- lm(data=stream, max90~RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
+model382 <- lm(data=stream, max90~DRAIN_SQKM +RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
+model466 <- lm(data=stream, max90~DRAIN_SQKM +RH_BASIN +RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
+model502 <- lm(data=stream, max90~DRAIN_SQKM +T_AVG_SITE +RH_BASIN +RRMEDIAN + DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
+summary(model130)
+summary(model256)
+summary(model382)
+summary(model466)
+summary(model502)
+
+
+
+summary(finalModel)
 boxcox.interact <- boxcox(finalModel,optimize=TRUE)
 summary(lm(stream$max90^boxcox.interact$lambda ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$RRMEDIAN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+
+
+
+
+
 
 ####### stepwise code: forward selection#####
 summary(testingModel)
