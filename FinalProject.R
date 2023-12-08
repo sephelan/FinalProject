@@ -277,6 +277,7 @@ bptest(streamCorFixModel)
 
 ######## Box COX Transformations  ##########
 #  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
+<<<<<<< HEAD
 #logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 #res_logmodel <- residuals(logmodel)
 #fit_log <- fitted.values(logmodel)
@@ -291,6 +292,41 @@ bptest(streamCorFixModel)
 #lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 #summary(transfinalmodel)
 #vif(lambdamodel)
+||||||| 7c19fe0
+logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+res_logmodel <- residuals(logmodel)
+fit_log <- fitted.values(logmodel)
+plot(res_logmodel~fit_log)
+qqnorm(res_logmodel)
+qqline(res_logmodel)
+shapiro.test(res_logmodel)
+summary(regstream)
+ b <- ols_step_all_possible(regstream)
+ c <- ols_step_all_possible(streamCorFixModel)
+plot(c) 
+lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+summary(transfinalmodel)
+vif(lambdamodel)
+
+testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)
+=======
+logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+res_logmodel <- residuals(logmodel)
+fit_log <- fitted.values(logmodel)
+plot(res_logmodel~fit_log)
+qqnorm(res_logmodel)
+qqline(res_logmodel)
+shapiro.test(res_logmodel)
+summary(regstream)
+ b <- ols_step_all_possible(regstream)
+ c <- ols_step_all_possible(streamCorFixModel)
+plot(c) 
+lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+summary(transfinalmodel)
+vif(lambdamodel)
+
+testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM:stream$DRAIN_SQKM)
+>>>>>>> 8a3e15ffe334670d6427315667f44719d1ad367b
 
 
 AIC(streamInterAddModel)
@@ -349,7 +385,12 @@ lm_add2 <- lm(stream$max90 ~ stream$T_AVG_BASIN + stream$DRAIN_SQKM  +stream$DRA
 summary(lm_add2)
 lm_add3 <- lm(stream$max90 ~  stream$RH_BASIN + stream$T_AVG_BASIN + stream$DRAIN_SQKM  +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
 summary(lm_add3)
-lm_add3
+tentative_model <- lm_add3
 ########## plots for model fitting#######
 t <- ols_step_all_possible(testingModel)
 plot(t)
+
+#### hypothesis test for model fitting###
+summary(testingModel)
+summary(tentative_model)
+anova(testingModel, tentative_model)
