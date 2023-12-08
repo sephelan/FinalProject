@@ -357,7 +357,7 @@ model130 <- lm(data=stream, max90~RH_BASIN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SIT
 model256 <- lm(data=stream, max90~RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
 model382 <- lm(data=stream, max90~DRAIN_SQKM +RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
 model466 <- lm(data=stream, max90~DRAIN_SQKM +RH_BASIN +RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
-model502 <- lm(data=stream, max90~DRAIN_SQKM +T_AVG_SITE +RH_BASIN +RRMEDIAN + DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
+model502 <- lm(data=stream, max90~DRAIN_SQKM+RH_BASIN+ T_AVG_SITE +RRMEDIAN + DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
 summary(model130)
 summary(model256)
 summary(model382)
@@ -365,7 +365,9 @@ summary(model466)
 summary(model502)
 
 
-
+allinteractionmodeol <- lm(stream$max90~(stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN)^2)
+a <- ols_step_all_possible(allinteractionmodeol)
+plot(a)
 summary(finalModel)
 boxcox.interact <- boxcox(finalModel,optimize=TRUE)
 summary(lm(stream$max90^boxcox.interact$lambda ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$RRMEDIAN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
@@ -386,6 +388,8 @@ summary(lm_add2)
 lm_add3 <- lm(stream$max90 ~  stream$RH_BASIN + stream$T_AVG_BASIN + stream$DRAIN_SQKM  +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
 summary(lm_add3)
 tentative_model <- lm_add3
+boxcoxfinl <- boxcox(tentative_model)
+boxcoxfinl$lambda
 ########## plots for model fitting#######
 t <- ols_step_all_possible(testingModel)
 plot(t)
@@ -394,3 +398,4 @@ plot(t)
 summary(testingModel)
 summary(tentative_model)
 anova(testingModel, tentative_model)
+
