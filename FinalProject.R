@@ -52,82 +52,6 @@ cor_stream
 addVarPlotModel <- lm(data=stream,max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_BASIN+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
 avPlots(addVarPlotModel)
 
-#  Basic LM of our project and leverage, fitted values, and residual plots
-library('car')
-n = 293
-regstream <- lm(max90 ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-regstream_matrix <- as.matrix(regstream)
-Y <- matrix(stream[,1], ncol = 1)
-X <- as.matrix(stream[,-1])
-onevec <- matrix(rep(1,n), ncol = 1)
-X <- cbind(onevec,X)
-X <- as.matrix(X)
-inv.XX <- solve(t(X)%*%X)
-H <- X%*%inv.XX%*%t(X)
-#  leverages
-lev <- diag(H)
-#  Residuals
-res_stream <- streamFirstModel$residuals
-jacknifes  <- rstudent(regstream)
-#  fitted values
-fittedvalues_stream <- fitted(regstream)
-
-#  residual plot against time
-par(mfrow=c(1,1))
-plot(res_stream , xlab="time", ylab="residual", main="Plot of residual against time")
-
-#  residual plots against fitted values:
-plot(res_stream~fittedvalues_stream, xlab="fitted values", ylab="residual", 
-     main="Plot of residuals against fitted values")
-
-#  residual plots against predictor values: 
-par(mfrow=c(2,4))
-plot(res_stream~stream$DRAIN_SQKM, xlab="Drain Area", ylab="residual", 
-     main="Plot of residuals against Drain Area")
-plot(res_stream~stream$PPTAVG_BASIN, xlab="Basin-Averaged Precipitation", ylab="residual", 
-     main="Plot of residuals against Basin-Averaged Precipitation")
-plot(res_stream~stream$T_AVG_BASIN, xlab="Basin-Averaged Temperature ", ylab="residual", 
-     main="Plot of residuals against Basin-Averaged Temperature ")
-plot(res_stream~stream$T_AVG_SITE, xlab="At-Site Temperature", ylab="residual", 
-     main="Plot of residuals against At-Site Temperature")
-plot(res_stream~stream$RH_BASIN, xlab="Basin-Averaged Relative Humidity", ylab="residual", 
-     main="Plot of residuals against Basin-Averaged Relative Humidity")
-plot(res_stream~stream$MAR_PPT7100_CM, xlab="Median Relief Ratio", ylab="residual", 
-     main="Plot of residuals against Median Relief Ratio")
-plot(res_stream~stream$RRMEDIAN, xlab="Average March Precipitatio", ylab="residual", 
-     main="Plot of residuals against Average March Precipitatio")
-
-######## exploratory data analysis #######
-summary(stream)
-
-par(mfrow=c(2,4))
-
-hist(stream$max90,xlab = 'max90', main="Max 90th Percentile Flow") #worry
-hist(stream$DRAIN_SQKM,xlab = 'DRAIN_SQKM', main="Drainage Area") #worry
-hist(stream$PPTAVG_BASIN,xlab = 'PPTAVG_BASIN', main="Average Basin Precipitation") #worry
-hist(stream$T_AVG_BASIN,xlab = 'T_AVG_BASIN', main="Average Basin Temperature")
-hist(stream$T_AVG_SITE,xlab = 'T_AVG_SITE', main="Average Temperature at the Stream Location")
-hist(stream$RH_BASIN,xlab = 'RH_BASIN', main="Average Relative Humidity Across the Basin") #worry
-hist(stream$MAR_PPT7100_CM,xlab = 'MAR_PPT7100_CM', main="Average March Precipitation") #worry
-hist(stream$RRMEDIAN,xlab = 'RRMEDIAN', main="Median Relief Ratio")
-
-boxplot(stream$max90, main="Max 90th Percentile Flow") 
-boxplot(stream$DRAIN_SQKM, main="Drainage Area") 
-boxplot(stream$PPTAVG_BASIN, main="Average Basin Precipitation") 
-boxplot(stream$T_AVG_BASIN, main="Average Basin Temperature")
-boxplot(stream$T_AVG_SITE, main="Average Temperature at the Stream Location")
-boxplot(stream$RH_BASIN, main="Average Relative Humidity Across the Basin")
-boxplot(stream$MAR_PPT7100_CM, main="Average March Precipitation")
-boxplot(stream$RRMEDIAN, main="Median Relief Ratio")
-
-pairs(stream)
-
-cor_stream = cor(stream)
-cor_stream
-#write.csv(cor_stream,"ProbMatrix.csv")
-
-avPlots(addVarPlotModel)
-
 ###### all predictor linear model analysis ###### 
 
 n=length(stream$max90)
@@ -181,15 +105,6 @@ table(stream$max90)
 
 
 
-
-
-######### Model Fitting ########
-summary(streamFirstModel)
-plot(streamFirstModel)
-streamReducedModel <- lm(stream$max90~stream$DRAIN_SQKM)
-summary(streamReducedModel)
-res_reducedmodel <- residuals(streamReducedModel)
-
 ##########multicolinearity#################
 vif(streamFirstModel)
 #yes, mostly avg basin and avg site with less in ppt avg basin
@@ -205,33 +120,62 @@ streamavgsiteMARModel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN
 streamavgbasinMARodel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_BASIN+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
 streamavgsitePPTModel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+PPTAVG_BASIN+RRMEDIAN)
 streamavgbasinPPTodel <- lm(data = stream , max90~DRAIN_SQKM+T_AVG_BASIN+RH_BASIN+PPTAVG_BASIN+RRMEDIAN)
+
+summary(streamavgsiteMARModel)
+summary(streamavgbasinMARodel)
+
 vif(streamavgbasinMARodel)
-sum(vif(streamavgbasinMARodel))
+sum(vif(streamavgbasinMARodel))/5
 vif(streamavgsiteMARModel)
-sum(vif(streamavgsiteMARModel))
+sum(vif(streamavgsiteMARModel))/5
 vif(streamavgsitePPTModel)
-sum(vif(streamavgsitePPTModel))
+sum(vif(streamavgsitePPTModel))/5
 vif(streamavgbasinPPTodel)
-sum(vif(streamavgbasinPPTodel))
+sum(vif(streamavgbasinPPTodel))/5
 
 streamCorFixModel <- lm(data = stream, max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
 summary(streamCorFixModel)
 summary(streamFirstModel)
-anova(streamCorFixModel,streamFirstModel)
-#now we have r2=.487 > r2=.465, meaning we will use our model streamavgbasinmodel
-streamInterAddModel <- lm(data = stream, max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN+DRAIN_SQKM:MAR_PPT7100_CM)
+
+streamAllInteractModel <- lm(data = stream, max90~(DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)^2)
+anova(streamAllInteractModel)
+summary(streamAllInteractModel)
 
 
-anova(streamInterAddModel,streamCorFixModel)
-res_corfix <- streamCorFixModel$residuals
-jacknifes <- rstudent(streamCorFixModel)
 
-lmtest <- lm(data = stream, max90~(DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)^2)
-anova(lmtest)
-summary(lmtest)
 
-streamManyInteractModel <- lm(data = stream, max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN+DRAIN_SQKM:MAR_PPT7100_CM+T_AVG_SITE:RRMEDIAN+DRAIN_SQKM:T_AVG_SITE+DRAIN_SQKM:RRMEDIAN)
-summary(streamManyInteractModel)
+
+d <- ols_step_all_possible(streamAllInteractModel)
+plot(d)
+
+summary(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+
+summary(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+AIC(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+BIC(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+
+
+model576 <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(model576)
+
+finalModel<- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+AIC(finalModel)
+BIC(finalModel)
+
+
+#### hypothesis test for model fitting###
+summary(testingModel)
+summary(tentative_model)
+anova(testingModel, tentative_model)
+
+
+
+
+
+
+
+
+
 
 
  # normality test for full # 
@@ -285,108 +229,53 @@ bptest(streamCorFixModel)
 #qqline(res_logmodel)
 #shapiro.test(res_logmodel)
 #summary(regstream)
-# b <- ols_step_all_possible(regstream)
-# c <- ols_step_all_possible(streamCorFixModel)
-#plot(c) 
 #lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
 #summary(transfinalmodel)
 #vif(lambdamodel)
-logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-res_logmodel <- residuals(logmodel)
-fit_log <- fitted.values(logmodel)
-plot(res_logmodel~fit_log)
-qqnorm(res_logmodel)
-qqline(res_logmodel)
-shapiro.test(res_logmodel)
-summary(regstream)
- b <- ols_step_all_possible(regstream)
- c <- ols_step_all_possible(streamCorFixModel)
-plot(c) 
-lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-summary(transfinalmodel)
-vif(lambdamodel)
-
-testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)
-logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-res_logmodel <- residuals(logmodel)
-fit_log <- fitted.values(logmodel)
-plot(res_logmodel~fit_log)
-qqnorm(res_logmodel)
-qqline(res_logmodel)
-shapiro.test(res_logmodel)
-summary(regstream)
- b <- ols_step_all_possible(regstream)
- c <- ols_step_all_possible(streamCorFixModel)
-plot(c) 
-lambdamodel <- lm(max90^lambda ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-summary(transfinalmodel)
-vif(lambdamodel)
-
-testingModel <- lm(stream$max90~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+stream$MAR_PPT7100_CM+stream$RRMEDIAN+stream$MAR_PPT7100_CM:stream$DRAIN_SQKM)
 
 
-AIC(streamInterAddModel)
-BIC(streamInterAddModel)
-#summary(lm(stream$max90^boxcox.interact$lambda~stream$DRAIN_SQKM+stream$T_AVG_BASIN+stream$RH_BASIN+(stream$MAR_PPT7100_CM*stream$DRAIN_SQKM)))        
-#AIC(streamFinalModel)
-ols_mallows_cp(streamInterAddModel,streamCorFixModel)
-
-d <- ols_step_all_possible(streamInterAddModel)
-plot(d)
-summary(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
-
-summary(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
-AIC(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
-BIC(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
-
-
-finalModel<- lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
-AIC(finalModel)
-BIC(finalModel)
-
-e <- ols_step_all_possible(streamManyInteractModel)
-plot(e)
-
-models = e$predictors[c(130,256,382,466,502)]
-models
-model130 <- lm(data=stream, max90~RH_BASIN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE)
-model256 <- lm(data=stream, max90~RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
-model382 <- lm(data=stream, max90~DRAIN_SQKM +RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
-model466 <- lm(data=stream, max90~DRAIN_SQKM +RH_BASIN +RRMEDIAN +DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
-model502 <- lm(data=stream, max90~DRAIN_SQKM +T_AVG_SITE +RH_BASIN +RRMEDIAN + DRAIN_SQKM:MAR_PPT7100_CM +T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:T_AVG_SITE +DRAIN_SQKM:RRMEDIAN)
-summary(model130)
-summary(model256)
-summary(model382)
-summary(model466)
-summary(model502)
 
 
 
 summary(finalModel)
 boxcox.interact <- boxcox(finalModel,optimize=TRUE)
-summary(lm(stream$max90^boxcox.interact$lambda ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$RRMEDIAN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+summary(lm(stream$max90^boxcox.interact$lambda ~ stream$DRAIN_SQKM +stream$T_AVG_BASIN +stream$RH_BASIN +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM))
+
+
+#  leverages
+lev <- diag(H)
+#  Residuals
+res_stream <- streamFirstModel$residuals
+jacknifes  <- rstudent(regstream)
+#  fitted values
+fittedvalues_stream <- fitted(regstream)
+
+#  residual plot against time
+par(mfrow=c(1,1))
+plot(res_stream , xlab="time", ylab="residual", main="Plot of residual against time")
+
+#  residual plots against fitted values:
+plot(res_stream~fittedvalues_stream, xlab="fitted values", ylab="residual", 
+     main="Plot of residuals against fitted values")
+
+#  residual plots against predictor values: 
+par(mfrow=c(2,4))
+plot(res_stream~stream$DRAIN_SQKM, xlab="Drain Area", ylab="residual", 
+     main="Plot of residuals against Drain Area")
+plot(res_stream~stream$PPTAVG_BASIN, xlab="Basin-Averaged Precipitation", ylab="residual", 
+     main="Plot of residuals against Basin-Averaged Precipitation")
+plot(res_stream~stream$T_AVG_BASIN, xlab="Basin-Averaged Temperature ", ylab="residual", 
+     main="Plot of residuals against Basin-Averaged Temperature ")
+plot(res_stream~stream$T_AVG_SITE, xlab="At-Site Temperature", ylab="residual", 
+     main="Plot of residuals against At-Site Temperature")
+plot(res_stream~stream$RH_BASIN, xlab="Basin-Averaged Relative Humidity", ylab="residual", 
+     main="Plot of residuals against Basin-Averaged Relative Humidity")
+plot(res_stream~stream$MAR_PPT7100_CM, xlab="Median Relief Ratio", ylab="residual", 
+     main="Plot of residuals against Median Relief Ratio")
+plot(res_stream~stream$RRMEDIAN, xlab="Average March Precipitatio", ylab="residual", 
+     main="Plot of residuals against Average March Precipitatio")
 
 
 
 
 
-
-####### stepwise code: forward selection#####
-summary(testingModel)
-lm_base<- lm(stream$max90 ~ stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
-summary(lm_base)
-lm_add1<- lm(stream$max90 ~ stream$DRAIN_SQKM + stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
-summary(lm_add1)
-lm_add2 <- lm(stream$max90 ~ stream$T_AVG_BASIN + stream$DRAIN_SQKM  +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
-summary(lm_add2)
-lm_add3 <- lm(stream$max90 ~  stream$RH_BASIN + stream$T_AVG_BASIN + stream$DRAIN_SQKM  +stream$DRAIN_SQKM:stream$MAR_PPT7100_CM)
-summary(lm_add3)
-tentative_model <- lm_add3
-########## plots for model fitting#######
-t <- ols_step_all_possible(testingModel)
-plot(t)
-
-#### hypothesis test for model fitting###
-summary(testingModel)
-summary(tentative_model)
-anova(testingModel, tentative_model)
