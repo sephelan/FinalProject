@@ -3,7 +3,7 @@ rm( list = ls())
 setwd("/Users/seanphelan/Desktop/Regression")
 stream = read.csv('streamflow.csv')
 stream$STAID <- NULL
-
+library("qpcR")
 library('car')
 library('pracma')
 library('moments')
@@ -157,31 +157,45 @@ BIC(lm(stream$max90 ~ stream$DRAIN_SQKM +stream$T_AVG_SITE +stream$RH_BASIN +str
 
 model576 <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
 summary(model576)
-
+summary(Tentative_Model)
 finalModel<- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
 AIC(finalModel)
 BIC(finalModel)
+ols_mallows_cp(finalModel,streamAllInteractModel)
 
 
+
+
+######stepwise testing for model####
+Base<- lm(data= stream, max90 ~ DRAIN_SQKM:MAR_PPT7100_CM)
+summary(Base)
+ols_mallows_cp(Base, streamAllInteractModel)
+AIC(Base)
+BIC(Base)
+Base_add1 <- lm(data= stream, max90 ~ DRAIN_SQKM:MAR_PPT7100_CM +  DRAIN_SQKM:T_AVG_SITE)
+summary(Base_add1)
+ols_mallows_cp(Base_add1, streamAllInteractModel)
+AIC(Base_add1)
+BIC(Base_add1)
+Base_add2 <- lm(data= stream, max90 ~ DRAIN_SQKM:MAR_PPT7100_CM +  DRAIN_SQKM:T_AVG_SITE + T_AVG_SITE:RRMEDIAN)
+summary(Base_add2)
+ols_mallows_cp(Base_add2, streamAllInteractModel)
+AIC(Base_add2)
+BIC(Base_add2)
+Base_add3 <- lm(data= stream, max90 ~  DRAIN_SQKM:MAR_PPT7100_CM +  DRAIN_SQKM:T_AVG_SITE + T_AVG_SITE:RRMEDIAN +DRAIN_SQKM:RRMEDIAN)
+summary(Base_add3)
+ols_mallows_cp(Base_add3, streamAllInteractModel)
+AIC(Base_add3)
+BIC(Base_add3)
+Tentative_Model <- lm(data= stream, max90 ~ DRAIN_SQKM:MAR_PPT7100_CM +  DRAIN_SQKM:T_AVG_SITE + T_AVG_SITE:RRMEDIAN)
+summary(Tentative_Model)
+anova(Tentative_Model, finalModel)
 #### hypothesis test for model fitting###
-summary(testingModel)
-summary(tentative_model)
-anova(testingModel, tentative_model)
-
-
-
-
-
-
-
-
-
-
-
+anova(Tentative_Model, streamAllInteractModel)
  # normality test for full # 
-qqnorm(res_corfix)
-qqline(res_corfix)
-shapiro.test(res_corfix)
+qqnorm(finalModel$residuals)
+qqline()
+shapiro.test(finalModel$residuals)
 ks.test(jacknifes,'pnorm',0,1)
 #ks test says not normal p-value = 2.942e-05 and ks better than shapiro because n>50.
 
