@@ -137,8 +137,8 @@ streamCorFixModel <- lm(data = stream, max90~DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_
 summary(streamCorFixModel)
 summary(streamFirstModel)
 
+
 streamAllInteractModel <- lm(data = stream, max90~(DRAIN_SQKM+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)^2)
-anova(streamAllInteractModel)
 summary(streamAllInteractModel)
 
 
@@ -162,6 +162,7 @@ finalModel<- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_S
 AIC(finalModel)
 BIC(finalModel)
 
+jacknifes <- rstudent(finalModel)
 
 #### hypothesis test for model fitting###
 summary(testingModel)
@@ -179,9 +180,9 @@ anova(testingModel, tentative_model)
 
 
  # normality test for full # 
-qqnorm(res_corfix)
-qqline(res_corfix)
-shapiro.test(res_corfix)
+qqnorm(finalModel$residuals)
+qqline(finalModel$residuals)
+shapiro.test(finalModel$residuals)
 ks.test(jacknifes,'pnorm',0,1)
 #ks test says not normal p-value = 2.942e-05 and ks better than shapiro because n>50.
 
