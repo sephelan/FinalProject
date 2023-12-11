@@ -282,36 +282,14 @@ shapiro.test(res_final_out)
 ks.test(res_final_out, "pnorm", 0 ,1)
 
 
-<<<<<<< HEAD
-
-||||||| 8f49e63
-=======
-=======
->>>>>>> de163a9c64cd72bfeeb15d052df4e75e0e9b223e
 anova(Tentative_Model, streamAllInteractModel)
  # normality test for full # 
-<<<<<<< HEAD
-qqnorm(finalmodelwo89_249_164_179_194$residuals)
-
-shapiro.test(finalmodelwo89_249_164_179_194$residuals)
-||||||| 8f49e63
-qqnorm(finalModel$residuals)
->>>>>>> 5d8a6177a5e4e4ee53774be71ce0224ed26f6ea9
-shapiro.test(finalModel$residuals)
-=======
 qqnorm(finalModel$residuals)
 
 shapiro.test(finalModel$residuals)
->>>>>>> de163a9c64cd72bfeeb15d052df4e75e0e9b223e
+
 ks.test(jacknifes,'pnorm',0,1)
 
-<<<<<<< HEAD
-||||||| 8f49e63
-<<<<<<< HEAD
-=======
-
-
->>>>>>> de163a9c64cd72bfeeb15d052df4e75e0e9b223e
 ##### Independence #####
 plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
 
