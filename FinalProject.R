@@ -250,28 +250,71 @@ summary(finalmodelwo89_249_164_179_194)
 ols_mallows_cp(finalmodelwo89_249_164_179_194, streamAllInteractModel)
 AIC(finalmodelwo89_249_164_179_194)
 BIC(finalmodelwo89_249_164_179_194)
+
+
+####### outlier removal based on plot #######
+stream <- stream[stream$STAID !=6452000, ] #179 -
+stream <- stream[stream$STAID !=6191500, ] #164 -
+stream <- stream[stream$STAID !=11532500, ] # 249  -
+stream <- stream[stream$STAID !=2315500, ] #89 - 
+stream <- stream[stream$STAID !=2110500, ] #78- 
+stream <- stream[stream$STAID !=2314500, ] #88- 
+stream <- stream[stream$STAID !=6447000, ] #177 -
+stream <- stream[stream$STAID !=3281500, ] #115 -
+stream <- stream[stream$STAID !=7056000, ] #194 -
+stream <- stream[stream$STAID !=11468000, ] #244 -
+stream <- stream[stream$STAID !=7067000, ] #197 -
+finalmodel_nolier <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+res_final_out<- rstudent(finalmodel_nolier)
+fit_final_out <- fitted(finalmodel_nolier)
+plot(res_final_out)
+axis(2, at = seq(-3, 3, by = 1))
+text(res_final_out, labels = stream$STAID, pos = 3)
+summary(finalmodel_nolier)
+
+
 # normality test for full # 
-res_final_out<- rstudent(finalmodelwo89_249_164_179)
-fit_final_out <- fitted(finalmodelwo89_249_164_179)
+res_final_out<- rstudent(finalmodel_nolier)
+fit_final_out <- fitted(finalmodel_nolier)
 qqnorm(res_final_out)
 qqline(res_final_out)
 shapiro.test(res_final_out)
 ks.test(res_final_out, "pnorm", 0 ,1)
 
 
+<<<<<<< HEAD
 
+||||||| 8f49e63
+=======
+=======
+>>>>>>> de163a9c64cd72bfeeb15d052df4e75e0e9b223e
 anova(Tentative_Model, streamAllInteractModel)
  # normality test for full # 
+<<<<<<< HEAD
 qqnorm(finalmodelwo89_249_164_179_194$residuals)
 
 shapiro.test(finalmodelwo89_249_164_179_194$residuals)
-ks.test(jacknifes,'pnorm',0,1)
-#ks test says not normal p-value = 2.942e-05 and ks better than shapiro because n>50.
+||||||| 8f49e63
+qqnorm(finalModel$residuals)
+>>>>>>> 5d8a6177a5e4e4ee53774be71ce0224ed26f6ea9
+shapiro.test(finalModel$residuals)
+=======
+qqnorm(finalModel$residuals)
 
+shapiro.test(finalModel$residuals)
+>>>>>>> de163a9c64cd72bfeeb15d052df4e75e0e9b223e
+ks.test(jacknifes,'pnorm',0,1)
+
+<<<<<<< HEAD
+||||||| 8f49e63
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> de163a9c64cd72bfeeb15d052df4e75e0e9b223e
 ##### Independence #####
 plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
-plot(res_final_out)
-dwtest(finalmodelwo89_249_164_179_194)
+
 #  constant variances #
 
 plot(fit_final_out, res_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
