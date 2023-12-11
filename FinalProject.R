@@ -205,7 +205,6 @@ jacknifes <- rstudent(finalModel)
 
 
 #### hypothesis test for model fitting###
-<<<<<<< HEAD
 anova(finalModel, streamAllInteractModel)
 
 
@@ -260,16 +259,15 @@ shapiro.test(res_final_out)
 ks.test(res_final_out, "pnorm", 0 ,1)
 
 
-=======
+
 anova(Tentative_Model, streamAllInteractModel)
  # normality test for full # 
-qqnorm(finalModel$residuals)
->>>>>>> 5d8a6177a5e4e4ee53774be71ce0224ed26f6ea9
-shapiro.test(finalModel$residuals)
+qqnorm(finalmodelwo89_249_164_179_194$residuals)
+
+shapiro.test(finalmodelwo89_249_164_179_194$residuals)
 ks.test(jacknifes,'pnorm',0,1)
 #ks test says not normal p-value = 2.942e-05 and ks better than shapiro because n>50.
 
-<<<<<<< HEAD
 ##### Independence #####
 plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
 plot(res_final_out)
@@ -286,9 +284,7 @@ plot(stream$RH_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="R
 plot(stream$MAR_PPT7100_CM , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
 plot(stream$RRMEDIAN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
 
-=======
 #  constant variances test for full #
->>>>>>> 5d8a6177a5e4e4ee53774be71ce0224ed26f6ea9
 
 ################## Lack of fit test template and example for just x90 #####
 # Lack of fit test aims to see if our fitted model is a more optimal model compared to the full model
