@@ -192,19 +192,81 @@ Tentative_Model <- lm(data= stream, max90 ~ DRAIN_SQKM:MAR_PPT7100_CM +  DRAIN_S
 summary(Tentative_Model)
 anova(Tentative_Model, finalModel)
 #### hypothesis test for model fitting###
-anova(Tentative_Model, streamAllInteractModel)
- # normality test for full # 
-qqnorm(finalModel$residuals)
-<<<<<<< HEAD
-qqline()
-=======
-qqline(finalModel$residuals)
->>>>>>> 2043fedefd8168d584cf38590070c1592910ebed
+anova(finalModel, streamAllInteractModel)
+
+
+
+######## outlier detection and testing#####
+
+ols_plot_dffits(finalModel)
+ols_plot_cooksd_chart(finalModel)
+ols_plot_dfbetas(finalModel)
+
+stream <- stream[stream$STAID !=2315500, ] #89
+stream
+finalmodelwo89 <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(finalmodelwo89)
+ols_mallows_cp(finalmodelwo89, streamAllInteractModel)
+AIC(finalmodelwo89)
+BIC(finalmodelwo89)
+
+stream <- stream[stream$STAID !=11532500, ] # 249 
+finalmodelwo89_249 <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(finalmodelwo89_249)
+ols_mallows_cp(finalmodelwo89_249, streamAllInteractModel)
+AIC(finalmodelwo89_249)
+BIC(finalmodelwo89_249)
+
+stream <- stream[stream$STAID !=6191500, ] #164
+finalmodelwo89_249_164 <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(finalmodelwo89_249_164)
+ols_mallows_cp(finalmodelwo89_249_164, streamAllInteractModel)
+AIC(finalmodelwo89_249_164)
+BIC(finalmodelwo89_249_164)
+
+stream <- stream[stream$STAID !=6452000, ] #179
+finalmodelwo89_249_164_179 <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(finalmodelwo89_249_164_179)
+ols_mallows_cp(finalmodelwo89_249_164_179, streamAllInteractModel)
+AIC(finalmodelwo89_249_164_179)
+BIC(finalmodelwo89_249_164_179)
+
+stream <- stream[stream$STAID !=7056000, ] #194
+finalmodelwo89_249_164_179_194 <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(finalmodelwo89_249_164_179_194)
+ols_mallows_cp(finalmodelwo89_249_164_179_194, streamAllInteractModel)
+AIC(finalmodelwo89_249_164_179_194)
+BIC(finalmodelwo89_249_164_179_194)
+# normality test for full # 
+res_final_out<- rstudent(finalmodelwo89_249_164_179)
+fit_final_out <- fitted(finalmodelwo89_249_164_179)
+qqnorm(res_final_out)
+qqline(res_final_out)
+shapiro.test(res_final_out)
+ks.test(res_final_out, "pnorm", 0 ,1)
+
+
 shapiro.test(finalModel$residuals)
 ks.test(jacknifes,'pnorm',0,1)
 #ks test says not normal p-value = 2.942e-05 and ks better than shapiro because n>50.
 
-#  constant variances test for full #
+##### Independence #####
+plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
+plot(res_final_out)
+dwtest(finalmodelwo89_249_164_179_194)
+#  constant variances #
+
+plot(fit_final_out, res_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
+par(mfrow=c(2,4))
+plot(stream$DRAIN_SQKM, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
+plot(stream$PPTAVG_BASIN, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
+plot(stream$T_AVG_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
+plot(stream$T_AVG_SITE, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
+plot(stream$RH_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
+plot(stream$MAR_PPT7100_CM , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
+plot(stream$RRMEDIAN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs Fitted Values")
+
+
 ################## Lack of fit test template and example for just x90 #####
 # Lack of fit test aims to see if our fitted model is a more optimal model compared to the full model
 # Needs assumptions of independence, constant variance, and normality with respect to the error terms.
