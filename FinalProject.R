@@ -239,7 +239,7 @@ stream <- stream[stream$STAID !=11468000, ] #244 -
 stream <- stream[stream$STAID !=7067000, ] #197 -
 finalmodel_nolier <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
 res_final_out<- rstudent(finalmodel_nolier)
-fit_final_out <- fitted(finalmodel_nolier)
+fit_final_out <- fitted.values(finalmodel_nolier)
 plot(res_final_out)
 axis(2, at = seq(-3, 3, by = 1))
 text(res_final_out, labels = stream$STAID, pos = 3)
@@ -267,11 +267,16 @@ ks.test(res_final_out, "pnorm", 0 ,1)
 summary(finalmodel_nolier)
 boxcox.summary <- boxcox(finalmodel_nolier, optimize = TRUE)
 lambda <- boxcox.summary$lambda
-tranform_model <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+transform_model <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
 summary(tranform_model)
 ######## residual plots for assumption checking after ##
-res_real <- rstudent(tranform_model)
-fit_real <- 
+res_real <- rstudent(transform_model)
+fit_real <- fitted.values(transform_model)
+qqnorm(res_real)
+ks.test(res_real, "pnorm", 0 ,1)
+plot(res_real)
+plot(res_real, fit_real, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
+
 ######### transformation######
 
 <<<<<<< HEAD
@@ -290,15 +295,15 @@ plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main
 
 #  constant variances #
 
-plot(fit_final_out, res_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
-par(mfrow=c(2,4))
-plot(stream$DRAIN_SQKM, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
-plot(stream$PPTAVG_BASIN, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
-plot(stream$T_AVG_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
-plot(stream$T_AVG_SITE, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
-plot(stream$RH_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
-plot(stream$MAR_PPT7100_CM , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
-plot(stream$RRMEDIAN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
+plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
+par(mfrow=c(1,1))
+plot(res_final_out, stream$DRAIN_SQKM, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
+plot(res_final_out,stream$PPTAVG_BASIN, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
+plot(res_final_out , stream$T_AVG_BASIN, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
+plot(res_final_out, stream$T_AVG_SITE, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
+plot(res_final_out , stream$RH_BASIN, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
+plot(res_final_out , stream$MAR_PPT7100_CM, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
+plot(res_final_out, stream$RRMEDIAN, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
 
 #  constant variances test for full #
 
@@ -334,7 +339,7 @@ lambda <- boxcox.summary$lambda
 # it also assumed variances of error terms are related ,??? how to test
 # H0: y1 = 0 or the variances are constant. Ha: y1=/=0, the the assumption of constant variances is violated. 
 # we know the normality assumption good, 
-bptest(streamFirstModel)
+bptest(transform_model)
 # p-value = 1.505e-08, so we have enough evidence to reject ho, non constant variances. 
 bptest(streamCorFixModel)
 # p-value = 0.00317 also no constant variances. 
@@ -425,13 +430,7 @@ abline(h=0)
 plot(res_final)
 par(mfrow=c(1,1))
 par(mfrow=c(2,4))
-plot(stream$DRAIN_SQKM, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
-plot(stream$PPTAVG_BASIN, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
-plot(stream$T_AVG_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
-plot(stream$T_AVG_SITE, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
-plot(stream$RH_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
-plot(stream$MAR_PPT7100_CM , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
-plot(stream$RRMEDIAN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
+
 
 
 finalmod2 <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
