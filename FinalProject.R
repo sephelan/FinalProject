@@ -246,9 +246,7 @@ text(res_final_out, labels = stream$STAID, pos = 3)
 summary(finalmodel_nolier)
 
 
-<<<<<<< HEAD
-# normality test # 
-=======
+# normality test #
 jacknifes <- rstudent(finalmodel_nolier)
 stream.final <- data.frame(stream$max90,stream$RH_BASIN,stream$DRAIN_SQKM*stream$T_AVG_SITE,stream$DRAIN_SQKM*stream$MAR_PPT7100_CM,stream$T_AVG_SITE*stream$RRMEDIAN)
 X.final <- cbind(1,as.matrix(stream.final[,c(2:5)]))
@@ -274,10 +272,6 @@ res_real <- rstudent(tranform_model)
 fit_real <- 
 ######### transformation######
 
-<<<<<<< HEAD
-=======
-anova(finalmodel_nolier, streamAllInteractModel)
->>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
  # normality test for full # 
 qqnorm(finalmodel_nolier$residuals)
 
@@ -339,104 +333,20 @@ bptest(streamFirstModel)
 bptest(streamCorFixModel)
 # p-value = 0.00317 also no constant variances. 
 
-<<<<<<< HEAD
-######### wls weighted regression ##########
-weights <- 1/(lambdamodel$fitted.values)^2
-weights
-W <- diag(weights)
-inv.XWX <- solve(t(X.final)%*%W%*%X.final)
-XWY <- t(X.final)%*%W%*%Y
-b.w<-inv.XWX%*%XWY
-b.w
-b.sd = sqrt(diag(inv.XWX))
-b.sd
-
-weightedModel <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
-summary(weightedModel)
-
-summary(finalModel)
-ols_mallows_cp(weightedModel, finalModel)
-AIC(weightedModel)
-
-
-=======
->>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
 
 ######## Box COX Transformations  ##########
-#  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
-#logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-#res_logmodel <- residuals(logmodel)
-#fit_log <- fitted.values(logmodel)
-#plot(res_logmodel~fit_log)
-#qqnorm(res_logmodel)
-#qqline(res_logmodel)
-#shapiro.test(res_logmodel)
-#summary(regstream)
-<<<<<<< HEAD
-
-=======
 boxcox.nolier <- boxcox(finalmodel_nolier,optimize = TRUE)
 lambda.nolier <- boxcox.nolier$lambda
 
-boxcox.summary.weightedOG <- boxcox(weightedModelOG, optimize = TRUE)
-lambda.weightedOG <- boxcox.summary.weightedOG$lambda
 
-boxcox.summary.weightedOG <- boxcox(weightedModelOG, optimize = TRUE)
-lambda.weightedOG <- boxcox.summary.weightedOG$lambda
-
-lambdaFirstModel <- lm(data = stream , max90^lambda.nolier~  RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
-summary(lambdaFirstModel)
-
-plot(lambdaFirstModel$residuals,lambdaFirstModel$fitted.values)
-ks.test(rstudent(lambdaFirstModel),'pnorm',0,1)
-
-
-<<<<<<< HEAD
 boxcox.summary <- boxcox(finalmodel_nolier, optimize = TRUE)
-boxcox.summary
 lambda <- boxcox.summary$lambda
 lambdamodel <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
-summary(lambdamodel)
-||||||| c7abcec
-boxcox.summary <- boxcox(finalmodel_nolier, optimize = TRUE)
-lambda.weighted <- boxcox.summary$lambda
-lambdamodel <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
-=======
-lambdamodelOG <- lm(data = streamog , max90^lambda.weightedOG ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weightsog)
-summary(lambdamodelOG)
-
-plot(lambdamodelOG$residuals,lambdamodelOG$fitted.values)
-ks.test(rstudent(lambdamodelOG),'pnorm',0,1)
->>>>>>> 0516586beded16f17aea12a8284f551ab5fb0e1e
 
 
-
-<<<<<<< HEAD
-weights <- 1/(lambdamodel$fitted.values)^2
-weightedTransdModel <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
-bptest(weightedTransdModel)
-summary(weightedTransdModel)
-plot(rstudent(weightedTransdModel),weightedTransdModel$fitted.values)
-
-||||||| c7abcec
-=======
-boxcox.summary.weighted <- boxcox(weightedModel, optimize = TRUE)
-lambda.weighted <- boxcox.summary.weighted$lambda
-
-lambdamodel <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weights)
->>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
-
-summary(finalmodel_nolier)
-summary(lambdamodel)
-anova(lambdamodel, finalmodel_nolier)
-AIC(lambdamodelOG)
-BIC(lambdamodelOG)
-ols_mallows_cp(lambdamodelOG,weightedModelOG)
 
 AIC(lambdamodel)
 BIC(lambdamodel)
-ols_mallows_cp(lambdamodel,weightedModel)
->>>>>>> 0516586beded16f17aea12a8284f551ab5fb0e1e
 
 res_final <- rstudent(lambdamodel)
 fit_final <- fitted.values((lambdamodel))
@@ -454,7 +364,6 @@ plot(stream$T_AVG_SITE, res_final, xlab="Residuals", ylab="X value" , main="Resi
 plot(stream$RH_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
 plot(stream$MAR_PPT7100_CM , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
 plot(stream$RRMEDIAN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
-<<<<<<< HEAD
 
 
 
@@ -465,12 +374,10 @@ stream.final <- data.frame(stream$max90,stream$RH_BASIN,stream$DRAIN_SQKM*stream
 
 
 # normality test for full # 
-res_final_out<- rstudent(finalmodel_nolier)
-fit_final_out <- fitted(finalmodel_nolier)
-qqnorm(res_final_out)
-qqline(res_final_out)
-shapiro.test(res_final_out)
-ks.test(res_final_out, "pnorm", 0 ,1)
+qqnorm(res_final)
+qqline(res_final)
+shapiro.test(res_final)
+ks.test(res_final, "pnorm", 0 ,1)
 
 
 anova(finalmodel_nolier, streamAllInteractModel)
@@ -486,66 +393,18 @@ plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main
 
 #  constant variances #
 
-plot(fit_final_out, res_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
+plot(res_final,fit_final, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
 par(mfrow=c(2,4))
-plot(stream$DRAIN_SQKM, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
-plot(stream$PPTAVG_BASIN, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
-plot(stream$T_AVG_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
-plot(stream$T_AVG_SITE, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
-plot(stream$RH_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
-plot(stream$MAR_PPT7100_CM , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
-plot(stream$RRMEDIAN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
+plot(res_final,stream$DRAIN_SQKM, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
+plot(res_final,stream$PPTAVG_BASIN, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
+plot(res_final,stream$T_AVG_BASIN , xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
+plot(res_final,stream$T_AVG_SITE,  xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
+plot(res_final,stream$RH_BASIN , xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
+plot(res_final,stream$MAR_PPT7100_CM , xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
+plot(res_final,stream$RRMEDIAN , xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
 
 #  constant variances test for full #
 
-||||||| c7abcec
-=======
 
 
-finalmod2 <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
-summary(finalmod2)
-=======
-######### wls weighted regression ##########
-weights.after <- 1/(finalmodel_nolier$fitted.values)^2
-W <- diag(weights)
-inv.XWX <- solve(t(X.final)%*%W%*%X.final)
-XWY <- t(X.final)%*%W%*%Y
-b.w<-inv.XWX%*%XWY
-b.w
-b.sd = sqrt(diag(inv.XWX))
-b.sd
 
-
-weights3 <- 1/(lambdaFirstModel$fitted.values)^2
-
-weightsog <- 1/(finalModelOutliersIN$fitted.values)^2
-
-weightedModelOG <- lm(data = streamog , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weightsog)
-
-plot(weightedModelOG$residuals,weightedModelOG$fitted.values)
-ks.test(rstudent(weightedModelOG),'pnorm',0,1)
-
-weightedModel <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
-summary(weightedModel)
-summary(weightedModelOG)
-summary(finalmodel_nolier)
-
-AIC(weightedModel)
-AIC(finalmodel_nolier)
-AIC(weightedModelOG)
-
-ols_sbc(weightedModel)
-ols_sbc(finalmodel_nolier)
-ols_sbc(weightedModelOG)
-
-ols_mallows_cp(weightedModel,finalmodel_nolier)
-ols_mallows_cp(weightedModelOG,finalModelOutliersIN)
-
-
-lambdaFirstweighted <- lm(data = stream , max90^lambda.nolier~  RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weights3)
-summary(lambdaFirstweighted)
-
-plot(lambdaFirstweighted$residuals,lambdaFirstweighted$fitted.values)
-ks.test(rstudent(lambdaFirstweighted),'pnorm',0,1)
-
->>>>>>> 0516586beded16f17aea12a8284f551ab5fb0e1e
