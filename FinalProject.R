@@ -396,14 +396,35 @@ plot(lambdaFirstModel$residuals,lambdaFirstModel$fitted.values)
 ks.test(rstudent(lambdaFirstModel),'pnorm',0,1)
 
 
+<<<<<<< HEAD
+boxcox.summary <- boxcox(finalmodel_nolier, optimize = TRUE)
+boxcox.summary
+lambda <- boxcox.summary$lambda
+lambdamodel <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(lambdamodel)
+||||||| c7abcec
+boxcox.summary <- boxcox(finalmodel_nolier, optimize = TRUE)
+lambda.weighted <- boxcox.summary$lambda
+lambdamodel <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+=======
 lambdamodelOG <- lm(data = streamog , max90^lambda.weightedOG ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weightsog)
 summary(lambdamodelOG)
 
 plot(lambdamodelOG$residuals,lambdamodelOG$fitted.values)
 ks.test(rstudent(lambdamodelOG),'pnorm',0,1)
+>>>>>>> 0516586beded16f17aea12a8284f551ab5fb0e1e
 
 
 
+<<<<<<< HEAD
+weights <- 1/(lambdamodel$fitted.values)^2
+weightedTransdModel <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
+bptest(weightedTransdModel)
+summary(weightedTransdModel)
+plot(rstudent(weightedTransdModel),weightedTransdModel$fitted.values)
+
+||||||| c7abcec
+=======
 boxcox.summary.weighted <- boxcox(weightedModel, optimize = TRUE)
 lambda.weighted <- boxcox.summary.weighted$lambda
 
@@ -420,6 +441,7 @@ ols_mallows_cp(lambdamodelOG,weightedModelOG)
 AIC(lambdamodel)
 BIC(lambdamodel)
 ols_mallows_cp(lambdamodel,weightedModel)
+>>>>>>> 0516586beded16f17aea12a8284f551ab5fb0e1e
 
 res_final <- rstudent(lambdamodel)
 fit_final <- fitted.values((lambdamodel))
@@ -430,7 +452,63 @@ abline(h=0)
 plot(res_final)
 par(mfrow=c(1,1))
 par(mfrow=c(2,4))
+<<<<<<< HEAD
 
+=======
+plot(stream$DRAIN_SQKM, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
+plot(stream$PPTAVG_BASIN, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
+plot(stream$T_AVG_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
+plot(stream$T_AVG_SITE, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
+plot(stream$RH_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
+plot(stream$MAR_PPT7100_CM , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
+plot(stream$RRMEDIAN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
+<<<<<<< HEAD
+
+
+
+
+# normality test # 
+jacknifes <- rstudent(lambdamodel)
+stream.final <- data.frame(stream$max90,stream$RH_BASIN,stream$DRAIN_SQKM*stream$T_AVG_SITE,stream$DRAIN_SQKM*stream$MAR_PPT7100_CM,stream$T_AVG_SITE*stream$RRMEDIAN)
+
+
+# normality test for full # 
+res_final_out<- rstudent(finalmodel_nolier)
+fit_final_out <- fitted(finalmodel_nolier)
+qqnorm(res_final_out)
+qqline(res_final_out)
+shapiro.test(res_final_out)
+ks.test(res_final_out, "pnorm", 0 ,1)
+
+
+anova(finalmodel_nolier, streamAllInteractModel)
+# normality test for full # 
+qqnorm(finalmodel_nolier$residuals)
+
+shapiro.test(finalmodel_nolier$residuals)
+
+ks.test(jacknifes,'pnorm',0,1)
+
+##### Independence #####
+plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
+
+#  constant variances #
+
+plot(fit_final_out, res_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
+par(mfrow=c(2,4))
+plot(stream$DRAIN_SQKM, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
+plot(stream$PPTAVG_BASIN, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
+plot(stream$T_AVG_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
+plot(stream$T_AVG_SITE, res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
+plot(stream$RH_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
+plot(stream$MAR_PPT7100_CM , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
+plot(stream$RRMEDIAN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
+
+#  constant variances test for full #
+
+||||||| c7abcec
+=======
+>>>>>>> ae346a7430a38f7ef08d53d0df5aa61c3c5d3f17
 
 
 finalmod2 <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
@@ -479,3 +557,4 @@ summary(lambdaFirstweighted)
 plot(lambdaFirstweighted$residuals,lambdaFirstweighted$fitted.values)
 ks.test(rstudent(lambdaFirstweighted),'pnorm',0,1)
 
+>>>>>>> 0516586beded16f17aea12a8284f551ab5fb0e1e
