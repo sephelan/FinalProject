@@ -324,8 +324,58 @@ bptest(streamFirstModel)
 bptest(streamCorFixModel)
 # p-value = 0.00317 also no constant variances. 
 
+
+######## Box COX Transformations  ##########
+#  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
+#logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
+#res_logmodel <- residuals(logmodel)
+#fit_log <- fitted.values(logmodel)
+#plot(res_logmodel~fit_log)
+#qqnorm(res_logmodel)
+#qqline(res_logmodel)
+#shapiro.test(res_logmodel)
+#summary(regstream)
+boxcox.nolier <- boxcox(finalmodel_nolier,optimize = TRUE)
+lambda.nolier <- boxcox.nolier$lambda
+
+boxcox.summary.weightedOG <- boxcox(weightedModelOG, optimize = TRUE)
+lambda.weightedOG <- boxcox.summary.weightedOG$lambda
+
+boxcox.summary.weightedOG <- boxcox(weightedModelOG, optimize = TRUE)
+lambda.weightedOG <- boxcox.summary.weightedOG$lambda
+
+lambdaFirstModel <- lm(data = stream , max90^lambda.nolier~  RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(lambdaFirstModel)
+
+plot(lambdaFirstModel$residuals,lambdaFirstModel$fitted.values)
+ks.test(rstudent(lambdaFirstModel),'pnorm',0,1)
+
+
+lambdamodelOG <- lm(data = streamog , max90^lambda.weightedOG ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weightsog)
+summary(lambdamodelOG)
+
+plot(lambdamodelOG$residuals,lambdamodelOG$fitted.values)
+ks.test(rstudent(lambdamodelOG),'pnorm',0,1)
+
+
+
+boxcox.summary.weighted <- boxcox(weightedModel, optimize = TRUE)
+lambda.weighted <- boxcox.summary.weighted$lambda
+
+lambdamodel <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weights)
+summary(lambdamodel)
+
+AIC(lambdamodelOG)
+BIC(lambdamodelOG)
+ols_mallows_cp(lambdamodelOG,weightedModelOG)
+
+AIC(lambdamodel)
+BIC(lambdamodel)
+ols_mallows_cp(lambdamodel,weightedModel)
+
+
 ######### wls weighted regression ##########
-weights <- 1/(finalmodel_nolier$fitted.values)^2
+weights.after <- 1/(finalmodel_nolier$fitted.values)^2
 W <- diag(weights)
 inv.XWX <- solve(t(X.final)%*%W%*%X.final)
 XWY <- t(X.final)%*%W%*%Y
@@ -335,9 +385,14 @@ b.sd = sqrt(diag(inv.XWX))
 b.sd
 
 
+weights3 <- 1/(lambdaFirstModel$fitted.values)^2
+
 weightsog <- 1/(finalModelOutliersIN$fitted.values)^2
 
 weightedModelOG <- lm(data = streamog , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weightsog)
+
+plot(weightedModelOG$residuals,weightedModelOG$fitted.values)
+ks.test(rstudent(weightedModelOG),'pnorm',0,1)
 
 weightedModel <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
 summary(weightedModel)
@@ -355,35 +410,9 @@ ols_sbc(weightedModelOG)
 ols_mallows_cp(weightedModel,finalmodel_nolier)
 ols_mallows_cp(weightedModelOG,finalModelOutliersIN)
 
-######## Box COX Transformations  ##########
-#  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
-#logmodel <- lm(log(max90) ~ DRAIN_SQKM + PPTAVG_BASIN + T_AVG_BASIN + T_AVG_SITE + RH_BASIN +  MAR_PPT7100_CM + RRMEDIAN, stream)
-#res_logmodel <- residuals(logmodel)
-#fit_log <- fitted.values(logmodel)
-#plot(res_logmodel~fit_log)
-#qqnorm(res_logmodel)
-#qqline(res_logmodel)
-#shapiro.test(res_logmodel)
-#summary(regstream)
 
-boxcox.summary.weightedOG <- boxcox(weightedModelOG, optimize = TRUE)
-lambda.weightedOG <- boxcox.summary.weightedOG$lambda
+lambdaFirstweighted <- lm(data = stream , max90^lambda.nolier~  RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weights3)
+summary(lambdaFirstweighted)
 
-lambdamodelOG <- lm(data = streamog , max90^lambda.weightedOG ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weightsog)
-summary(lambdamodelOG)
-
-boxcox.summary.weighted <- boxcox(weightedModel, optimize = TRUE)
-lambda.weighted <- boxcox.summary.weighted$lambda
-
-lambdamodel <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weights)
-summary(lambdamodel)
-
-AIC(lambdamodelOG)
-BIC(lambdamodelOG)
-ols_mallows_cp(lambdamodelOG,weightedModelOG)
-
-AIC(lambdamodel)
-BIC(lambdamodel)
-ols_mallows_cp(lambdamodel,weightedModel)
-
-
+plot(lambdaFirstweighted$residuals,lambdaFirstweighted$fitted.values)
+ks.test(rstudent(lambdaFirstweighted),'pnorm',0,1)
