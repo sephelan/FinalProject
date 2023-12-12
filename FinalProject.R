@@ -2,6 +2,7 @@
 rm( list = ls())
 setwd("/Users/seanphelan/Desktop/Regression")
 stream = read.csv('streamflow.csv')
+streamog = read.csv('streamflow.csv')
 stream$STAID <- NULL
 library("qpcR")
 library('car')
@@ -47,6 +48,7 @@ pairs(stream)
 
 cor_stream = cor(stream)
 cor_stream
+res_stream <- streamFirstModel$residuals
 #write.csv(cor_stream,"ProbMatrix.csv")
 
 addVarPlotModel <- lm(data=stream,max90~DRAIN_SQKM+PPTAVG_BASIN+T_AVG_BASIN+T_AVG_SITE+RH_BASIN+MAR_PPT7100_CM+RRMEDIAN)
@@ -58,49 +60,17 @@ n=length(stream$max90)
 p=8
 alpha = .05
 
-Y <- matrix(data=stream$max90,nrow = n,ncol = 1)
+Y <- matrix(data=stream$max90,ncol = 1)
 X <- as.matrix(stream[2:8])
 X <- cbind(rep.int(1,n),X)
 colnames(X)[1]<-"Intercept"
 
-inv.XX <- solve(t(X)%*%X)
-b <- inv.XX%*%t(X)%*%Y
-
-I <- diag(1,n,n)
-H <- X%*%inv.XX%*%t(X)
-Yhat <- H%*%Y
-e <- Y - Yhat
-
-J <- matrix(rep.int(1,n*n),ncol=n,nrow = n)
-SSE <- t(Y)%*%(I-H)%*%Y
-MSE <- SSE/(n-p)
-
-SST <- t(Y)%*%(I-(1/n)*J)%*%Y
-SSR <- t(Y)%*%(H-(1/n)*J)%*%Y
-
-Rsquared <- 1-(SSE/SST)
-RsqAdj <- 1-((n-1)/(n-p))*(SSE/SST)
-
-MSR <- SSR/(p-1)
-Fstat <- MSR/MSE
-CritF <- qf(.95,p-1,n-p)
-pval <- 1-pf(Fstat,p-1,n-p)
-
-cov.b <- inv.XX*c(MSE)
-s.bhats <- sqrt(diag(cov.b))
-
-t.values <- b/s.bhats
-p.values <- 2*(1-pt(abs(t.values),n-p))
-p.values
 
 # ###### adding in residual plots and all the df tests ###
 plot(res_stream~ stream$max90,xlab="Response Variable",ylab="Residual", 
      main="Plot of residuals against Response Variable")
-ols_plot_dffits(regstream)
-ols_plot_cooksd_chart(regstream)
-ols_plot_dfbetas(regstream)
-summary(regstream)
-plot(regstream)
+summary(streamFirstModel)
+plot(streamFirstModel)
 table(stream$max90)
 
 
@@ -133,6 +103,10 @@ sum(vif(streamavgsitePPTModel))/5
 vif(streamavgbasinPPTodel)
 sum(vif(streamavgbasinPPTodel))/5
 
+remove(streamNOSiteModel)
+remove(streamNOBasinModel)
+remove(streamNOavgbasinModel)
+remove(streamNOmarpptModel)
 remove(streamavgbasinPPTodel)
 remove(streamavgbasinMARodel)
 remove(streamavgsiteMARModel)
@@ -172,7 +146,7 @@ AIC(Base_add3)
 BIC(Base_add3)
 Tentative_Model <- lm(data= stream, max90 ~ DRAIN_SQKM:MAR_PPT7100_CM +  DRAIN_SQKM:T_AVG_SITE + T_AVG_SITE:RRMEDIAN)
 summary(Tentative_Model)
-anova(Tentative_Model, finalModel)
+anova(Tentative_Model, Base)
 
 
 ########ols all step section #######
@@ -200,12 +174,10 @@ AIC(finalModel)
 BIC(finalModel)
 ols_mallows_cp(finalModel,streamAllInteractModel)
 
-
 jacknifes <- rstudent(finalModel)
 
 
 #### hypothesis test for model fitting###
-<<<<<<< HEAD
 anova(finalModel, streamAllInteractModel)
 
 
@@ -254,15 +226,15 @@ BIC(finalmodelwo89_249_164_179_194)
 
 
 ####### outlier removal based on plot #######
-stream <- stream[stream$STAID !=6452000, ] #179 -
-stream <- stream[stream$STAID !=6191500, ] #164 -
-stream <- stream[stream$STAID !=11532500, ] # 249  -
-stream <- stream[stream$STAID !=2315500, ] #89 - 
+#stream <- stream[stream$STAID !=6452000, ] #179 -Above
+#stream <- stream[stream$STAID !=6191500, ] #164 -Above
+#stream <- stream[stream$STAID !=11532500, ] # 249  -Above
+#stream <- stream[stream$STAID !=2315500, ] #89 - Above
 stream <- stream[stream$STAID !=2110500, ] #78- 
 stream <- stream[stream$STAID !=2314500, ] #88- 
 stream <- stream[stream$STAID !=6447000, ] #177 -
 stream <- stream[stream$STAID !=3281500, ] #115 -
-stream <- stream[stream$STAID !=7056000, ] #194 -
+#stream <- stream[stream$STAID !=7056000, ] #194 -Above
 stream <- stream[stream$STAID !=11468000, ] #244 -
 stream <- stream[stream$STAID !=7067000, ] #197 -
 finalmodel_nolier <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
@@ -274,7 +246,18 @@ text(res_final_out, labels = stream$STAID, pos = 3)
 summary(finalmodel_nolier)
 
 
+<<<<<<< HEAD
 # normality test # 
+=======
+jacknifes <- rstudent(finalmodel_nolier)
+stream.final <- data.frame(stream$max90,stream$RH_BASIN,stream$DRAIN_SQKM*stream$T_AVG_SITE,stream$DRAIN_SQKM*stream$MAR_PPT7100_CM,stream$T_AVG_SITE*stream$RRMEDIAN)
+X.final <- cbind(1,as.matrix(stream.final[,c(2:5)]))
+Y <- matrix(data=stream$max90,ncol = 1)
+finalModelOutliersIN<- lm(data = streamog , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+
+
+# normality test for full # 
+>>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
 res_final_out<- rstudent(finalmodel_nolier)
 fit_final_out <- fitted(finalmodel_nolier)
 qqnorm(res_final_out)
@@ -283,13 +266,16 @@ shapiro.test(res_final_out)
 ks.test(res_final_out, "pnorm", 0 ,1)
 
 
+<<<<<<< HEAD
+=======
+anova(finalmodel_nolier, streamAllInteractModel)
+>>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
  # normality test for full # 
-qqnorm(finalModel$residuals)
+qqnorm(finalmodel_nolier$residuals)
 
-shapiro.test(finalModel$residuals)
+shapiro.test(finalmodel_nolier$residuals)
+
 ks.test(jacknifes,'pnorm',0,1)
-
-
 
 ##### Independence #####
 plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
@@ -306,9 +292,7 @@ plot(stream$RH_BASIN , res_final_out, xlab="Residuals", ylab="X value" , main="R
 plot(stream$MAR_PPT7100_CM , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
 plot(stream$RRMEDIAN , res_final_out, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
 
-=======
 #  constant variances test for full #
->>>>>>> 5d8a6177a5e4e4ee53774be71ce0224ed26f6ea9
 
 ################## Lack of fit test template and example for just x90 #####
 # Lack of fit test aims to see if our fitted model is a more optimal model compared to the full model
@@ -347,6 +331,7 @@ bptest(streamFirstModel)
 bptest(streamCorFixModel)
 # p-value = 0.00317 also no constant variances. 
 
+<<<<<<< HEAD
 ######### wls weighted regression ##########
 weights <- 1/(lambdamodel$fitted.values)^2
 weights
@@ -366,6 +351,8 @@ ols_mallows_cp(weightedModel, finalModel)
 AIC(weightedModel)
 
 
+=======
+>>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
 
 ######## Box COX Transformations  ##########
 #  basically from today we should get our assumptions safe first before choosing difference model fits, which mean the box cox transformation
@@ -377,17 +364,50 @@ AIC(weightedModel)
 #qqline(res_logmodel)
 #shapiro.test(res_logmodel)
 #summary(regstream)
+<<<<<<< HEAD
 summary(finalmodel_nolier)
 boxcox.summary <- boxcox(finalmodel_nolier, optimize = TRUE)
 lambda.weighted <- boxcox.summary$lambda
 lambdamodel <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+=======
+boxcox.nolier <- boxcox(finalmodel_nolier,optimize = TRUE)
+lambda.nolier <- boxcox.nolier$lambda
+
+boxcox.summary.weightedOG <- boxcox(weightedModelOG, optimize = TRUE)
+lambda.weightedOG <- boxcox.summary.weightedOG$lambda
+
+boxcox.summary.weightedOG <- boxcox(weightedModelOG, optimize = TRUE)
+lambda.weightedOG <- boxcox.summary.weightedOG$lambda
+
+lambdaFirstModel <- lm(data = stream , max90^lambda.nolier~  RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
+summary(lambdaFirstModel)
+
+plot(lambdaFirstModel$residuals,lambdaFirstModel$fitted.values)
+ks.test(rstudent(lambdaFirstModel),'pnorm',0,1)
+
+
+lambdamodelOG <- lm(data = streamog , max90^lambda.weightedOG ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weightsog)
+summary(lambdamodelOG)
+
+plot(lambdamodelOG$residuals,lambdamodelOG$fitted.values)
+ks.test(rstudent(lambdamodelOG),'pnorm',0,1)
+
+
+
+boxcox.summary.weighted <- boxcox(weightedModel, optimize = TRUE)
+lambda.weighted <- boxcox.summary.weighted$lambda
+
+lambdamodel <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weights)
+>>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
 summary(lambdamodel)
+
+AIC(lambdamodelOG)
+BIC(lambdamodelOG)
+ols_mallows_cp(lambdamodelOG,weightedModelOG)
 
 AIC(lambdamodel)
 BIC(lambdamodel)
-ols_mallows_cp(lambdamodel,finalModel)
-AIC(finalModel)
-BIC(finalModel)
+ols_mallows_cp(lambdamodel,weightedModel)
 
 res_final <- rstudent(lambdamodel)
 fit_final <- fitted.values((lambdamodel))
@@ -406,5 +426,50 @@ plot(stream$RH_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Resid
 plot(stream$MAR_PPT7100_CM , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
 plot(stream$RRMEDIAN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
 
+<<<<<<< HEAD
 finalmod2 <- lm(data = stream , max90^lambda.weighted ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
 summary(finalmod2)
+=======
+######### wls weighted regression ##########
+weights.after <- 1/(finalmodel_nolier$fitted.values)^2
+W <- diag(weights)
+inv.XWX <- solve(t(X.final)%*%W%*%X.final)
+XWY <- t(X.final)%*%W%*%Y
+b.w<-inv.XWX%*%XWY
+b.w
+b.sd = sqrt(diag(inv.XWX))
+b.sd
+
+
+weights3 <- 1/(lambdaFirstModel$fitted.values)^2
+
+weightsog <- 1/(finalModelOutliersIN$fitted.values)^2
+
+weightedModelOG <- lm(data = streamog , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weightsog)
+
+plot(weightedModelOG$residuals,weightedModelOG$fitted.values)
+ks.test(rstudent(weightedModelOG),'pnorm',0,1)
+
+weightedModel <- lm(data = stream , max90 ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN, weights = weights)
+summary(weightedModel)
+summary(weightedModelOG)
+summary(finalmodel_nolier)
+
+AIC(weightedModel)
+AIC(finalmodel_nolier)
+AIC(weightedModelOG)
+
+ols_sbc(weightedModel)
+ols_sbc(finalmodel_nolier)
+ols_sbc(weightedModelOG)
+
+ols_mallows_cp(weightedModel,finalmodel_nolier)
+ols_mallows_cp(weightedModelOG,finalModelOutliersIN)
+
+
+lambdaFirstweighted <- lm(data = stream , max90^lambda.nolier~  RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN,weights = weights3)
+summary(lambdaFirstweighted)
+
+plot(lambdaFirstweighted$residuals,lambdaFirstweighted$fitted.values)
+ks.test(rstudent(lambdaFirstweighted),'pnorm',0,1)
+>>>>>>> 083eae8fd8941119b0d3466475942a2d56ef1ce9
