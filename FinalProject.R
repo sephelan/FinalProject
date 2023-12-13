@@ -266,7 +266,7 @@ summary(finalmodel_nolier)
 boxcox.summary <- boxcox(finalmodel_nolier, optimize = TRUE)
 lambda <- boxcox.summary$lambda
 transform_model <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
-summary(tranform_model)
+summary(transform_model)
 ######## residual plots for assumption checking after ##
 res_real <- rstudent(transform_model)
 fit_real <- fitted.values(transform_model)
@@ -290,10 +290,8 @@ plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main
 #  constant variances #
 
 plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
-par(mfrow=c(1,1))
+par(mfrow=c(2,3))
 plot(res_final_out, stream$DRAIN_SQKM, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
-plot(res_final_out,stream$PPTAVG_BASIN, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
-plot(res_final_out , stream$T_AVG_BASIN, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
 plot(res_final_out, stream$T_AVG_SITE, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
 plot(res_final_out , stream$RH_BASIN, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
 plot(res_final_out , stream$MAR_PPT7100_CM, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
@@ -349,9 +347,11 @@ lambda <- boxcox.summary$lambda
 lambdamodel <- lm(data = stream , max90^lambda ~ RH_BASIN+ DRAIN_SQKM:T_AVG_SITE+ DRAIN_SQKM:MAR_PPT7100_CM+ T_AVG_SITE:RRMEDIAN)
 
 
-
+AIC(finalmodel_nolier)
+BIC(finalmodel_nolier)
 AIC(lambdamodel)
 BIC(lambdamodel)
+
 
 res_final <- rstudent(lambdamodel)
 fit_final <- fitted.values((lambdamodel))
@@ -361,17 +361,13 @@ plot(res_final, fit_final)
 abline(h=0)
 plot(res_final)
 par(mfrow=c(1,1))
-par(mfrow=c(2,4))
-<<<<<<< HEAD
+par(mfrow=c(2,3))
 
-=======
-plot(stream$DRAIN_SQKM, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
-plot(stream$PPTAVG_BASIN, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs PPTAVG_BASIN")
-plot(stream$T_AVG_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_BASIN")
-plot(stream$T_AVG_SITE, res_final, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
-plot(stream$RH_BASIN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
-plot(stream$MAR_PPT7100_CM , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
-plot(stream$RRMEDIAN , res_final, xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
+plot(res_final,stream$DRAIN_SQKM,  xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
+plot(res_final,stream$T_AVG_SITE, xlab="Residuals", ylab="X value" , main="Residuals vs T_AVG_SITE")
+plot(res_final,stream$RH_BASIN , xlab="Residuals", ylab="X value" , main="Residuals vs RH_BASIN")
+plot(res_final,stream$MAR_PPT7100_CM , xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
+plot(res_final,stream$RRMEDIAN , xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
 
 
 
@@ -398,9 +394,10 @@ ks.test(jacknifes,'pnorm',0,1)
 
 ##### Independence #####
 plot(res_final_out, fit_final_out, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
-
+  
 #  constant variances #
 
+bptest(lambdamodel)
 plot(res_final,fit_final, xlab="Residuals", ylab="Fitted Values" , main="Residuals vs Fitted Values")
 par(mfrow=c(2,4))
 plot(res_final,stream$DRAIN_SQKM, xlab="Residuals", ylab="X value" , main="Residuals vs DrainSQKM")
@@ -411,17 +408,10 @@ plot(res_final,stream$RH_BASIN , xlab="Residuals", ylab="X value" , main="Residu
 plot(res_final,stream$MAR_PPT7100_CM , xlab="Residuals", ylab="X value" , main="Residuals vs MAR_PPT7100_CM")
 plot(res_final,stream$RRMEDIAN , xlab="Residuals", ylab="X value" , main="Residuals vs RRMEDIAN")
 
-#  constant variances test for full #
 
-<<<<<<< HEAD
-||||||| ae346a7
-||||||| c7abcec
-=======
-=======
-||||||| c7abcec
-=======
->>>>>>> ae346a7430a38f7ef08d53d0df5aa61c3c5d3f17
->>>>>>> be82cdc82b19a00c0261886e6f9dfb0b21f65a43
+
+
+summary(lambdamodel)
 
 
 
